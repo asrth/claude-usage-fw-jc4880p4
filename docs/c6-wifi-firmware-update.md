@@ -18,7 +18,13 @@ C6's UART pins exposed on the **Expand-IO header JP1**. Verified on real hardwar
 
 ## What you need
 
-- A **3.3 V USB–TTL adapter** (CP2102/CH340/FT232 — must be 3.3 V logic)
+- A **3.3 V USB–TTL adapter** — **use FTDI (FT232) or CP2102**, must be 3.3 V logic.
+  ⚠️ **Avoid WCH CH342/CH343 dual-UART adapters on macOS**: the Apple driver wedges
+  the TX path on any burst larger than a few hundred bytes (sync/erase work, the
+  first data block dies with `Write timeout` / "chip stopped responding").
+  Deasserting DTR/RTS via an `esptool.cfg` `custom_reset_sequence = D0|R0|W0.3`
+  (+ `--before default-reset`) revives small commands but bulk writes still fail —
+  an FTDI adapter flashed the same board first try (1.2 MB @460800 in 17 s).
 - Jumper wires
 - [`esptool`](https://docs.espressif.com/projects/esptool/) on the host PC
 - The slave image: **`network_adapter_esp32c6.bin`** (2.12.x) from
